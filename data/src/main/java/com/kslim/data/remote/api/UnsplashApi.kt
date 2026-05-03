@@ -24,9 +24,4 @@ interface UnsplashApi {
     suspend fun getPhotoStatistics(
         @Path("id") id: String
     ): PhotoStatisticResponse
-
-
-    companion object {
-        const val BASE_URL = "https://api.unsplash.com/"
-    }
 }
