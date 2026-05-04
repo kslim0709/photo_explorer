@@ -9,18 +9,18 @@ import retrofit2.http.Query
 
 interface UnsplashApi {
 
-    @GET("photos")
+    @GET("/photos")
     suspend fun getPhotos(
         @Query("page") page: Int,
         @Query("per_page") perPage: Int
     ): List<PhotoResponse>
 
-    @GET("photos/{id}")
+    @GET("/photos/{id}")
     suspend fun getPhotoDetail(
         @Path("id") id: String
     ): PhotoDetailResponse
 
-    @GET("photos/{id}/statistics")
+    @GET("/photos/{id}/statistics")
     suspend fun getPhotoStatistics(
         @Path("id") id: String
     ): PhotoStatisticResponse

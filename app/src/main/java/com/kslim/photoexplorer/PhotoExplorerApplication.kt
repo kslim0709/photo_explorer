@@ -1,7 +1,9 @@
 package com.kslim.photoexplorer
 
 import android.app.Application
+import dagger.hilt.android.HiltAndroidApp
 
 
-class PhotoExplorerApplication: Application() {
+@HiltAndroidApp
+class PhotoExplorerApplication : Application() {
 }

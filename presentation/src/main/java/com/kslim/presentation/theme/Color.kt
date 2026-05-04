@@ -1,4 +1,4 @@
-package com.kslim.photoexplorer.ui.theme
+package com.kslim.presentation.theme
 
 import androidx.compose.ui.graphics.Color
 

@@ -68,9 +68,6 @@ dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
 
-    // java.time desugaring 사용할 경우
-    // coreLibraryDesugaring(libs.android.desugar.jdk.libs)
-
     // Unit Test
     testImplementation(libs.junit)
 
