@@ -5,6 +5,8 @@ plugins {
 
     alias(libs.plugins.hilt)
     alias(libs.plugins.ksp)
+    alias(libs.plugins.kotlin.serialization)
+
 }
 
 android {
@@ -47,4 +49,11 @@ dependencies {
 
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
+
+    // PhotoScreen Route 에서 사용
+    implementation(libs.kotlinx.serialization)
+
+    // Debug
+    debugImplementation(libs.androidx.compose.ui.tooling)
+//    debugImplementation(libs.androidx.compose.ui.test.manifest)
 }

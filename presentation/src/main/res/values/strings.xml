@@ -1,3 +1,24 @@
 <resources>
     <string name="app_name">PhotoExplorer</string>
+
+    <string name="title_home">Photo Explorer</string>
+    <string name="title_favorites">Favorites</string>
+    <string name="title_detail">Photo Detail</string>
+
+    <string name="description_favorite">Favorite</string>
+    <string name="description_back">Back</string>
+    <string name="description_photo">Photo</string>
+
+    <string name="error_network">인터넷 연결을 확인해주세요.</string>
+    <string name="error_timeout">요청 시간이 초과되었습니다.</string>
+    <string name="error_unauthorized">인증이 필요합니다.</string>
+    <string name="error_forbidden">접근 권한이 없습니다.</string>
+    <string name="error_not_found">데이터를 찾을 수 없습니다.</string>
+    <string name="error_server">서버 오류가 발생했습니다.</string>
+    <string name="error_unknown">알 수 없는 오류가 발생했습니다.</string>
+
+    <string name="error_photo_list_empty">표시할 사진이 없습니다.</string>
+
+    <string name="retry">다시 시도</string>
+
 </resources>
