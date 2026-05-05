@@ -36,7 +36,9 @@ data class UserResponse(
     @SerialName("bio") val bio: String = "",
     @SerialName("location") val location: String = "",
     @SerialName("profile_image") val profileImage: ProfileImage? = null,
-    @SerialName("links") val links: UserLinks? = null
+    @SerialName("links") val links: UserLinks? = null,
+    @SerialName("twitter_username") val twitterUsername: String ="",
+    @SerialName("instagram_username") val instagramUsername: String =""
 ) {
 
     @Serializable

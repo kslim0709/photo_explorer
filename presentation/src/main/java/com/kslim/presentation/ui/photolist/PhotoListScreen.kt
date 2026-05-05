@@ -23,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -36,6 +37,7 @@ import com.kslim.presentation.ui.component.PhotoErrorContent
 import com.kslim.presentation.ui.component.PhotoExplorerTopBar
 import com.kslim.presentation.ui.component.PhotoGridItem
 import com.kslim.presentation.ui.model.PhotoUiModel
+import kotlinx.coroutines.launch
 
 
 @Composable
@@ -47,12 +49,19 @@ fun PhotoListScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
 
+    val coroutineScope = rememberCoroutineScope()
+
+
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
                 PhotoListSideEffect.NavigateToFavorite -> onNavigateToFavorite()
                 is PhotoListSideEffect.NavigateToDetail -> onNavigateToDetail(effect.photoId)
-                is PhotoListSideEffect.ShowSnackBar -> snackBarHostState.showSnackbar(effect.message)
+                is PhotoListSideEffect.ShowSnackBar -> {
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar(effect.message)
+                    }
+                }
             }
         }
     }

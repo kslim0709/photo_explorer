@@ -15,6 +15,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -26,6 +27,7 @@ import com.kslim.presentation.ui.component.PhotoErrorContent
 import com.kslim.presentation.ui.component.PhotoExplorerTopBar
 import com.kslim.presentation.ui.component.PhotoGridItem
 import com.kslim.presentation.ui.model.PhotoUiModel
+import kotlinx.coroutines.launch
 
 @Composable
 fun PhotoFavoriteScreen(
@@ -37,11 +39,20 @@ fun PhotoFavoriteScreen(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackBarHostState = remember { SnackbarHostState() }
 
+    val coroutineScope = rememberCoroutineScope()
+
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
-                is PhotoFavoriteSideEffect.ShowSnackBar -> snackBarHostState.showSnackbar(effect.message)
-                PhotoFavoriteSideEffect.NavigateBack -> onBackClick()
+                is PhotoFavoriteSideEffect.ShowSnackBar -> {
+                    coroutineScope.launch {
+                        snackBarHostState.showSnackbar(effect.message)
+                    }
+                }
+                PhotoFavoriteSideEffect.NavigateBack -> {
+                    snackBarHostState.currentSnackbarData?.dismiss()
+                    onBackClick()
+                }
                 is PhotoFavoriteSideEffect.NavigateToDetail -> onNavigateToDetail(effect.photoId)
             }
         }

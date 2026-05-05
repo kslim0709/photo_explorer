@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.sp
 import com.kslim.presentation.R
 import com.kslim.presentation.theme.PhotoExplorerTheme
 import com.kslim.presentation.ui.model.PhotoUiModel
+import com.kslim.presentation.ui.model.PhotoUserProfile
 
 @Composable
 fun PhotoGridItem(
@@ -91,16 +92,17 @@ fun PhotoGridItem(
                             color = Color.White,
                             shape = CircleShape
                         ),
-                    imageUrl = photo.userProfileImageUrl,
+                    imageUrl = photo.userProfile.profileImageUrl,
                     contentDescription = stringResource(R.string.description_photo),
-                    memoryCacheKey = "${photo.id}_${photo.userProfileImageUrl}",
-                    contentScale = ContentScale.Crop
+                    memoryCacheKey = "${photo.id}_${photo.userProfile.profileImageUrl}",
+                    contentScale = ContentScale.Crop,
+                    placeholderRes = R.drawable.ic_account_box
                 )
 
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
-                    text = photo.userName,
+                    text = photo.userProfile.name,
                     color = Color.White,
                     fontSize = 14.sp,
                     maxLines = 1,
@@ -134,8 +136,10 @@ fun PhotoGridItemPreview() {
             photo = PhotoUiModel.PhotoList(
                 id = "1",
                 imageUrl = "",
-                userName = "Alex Smith",
-                userProfileImageUrl = "",
+                userProfile = PhotoUserProfile(
+                    name = "Alex Smith",
+                    profileImageUrl = ""
+                ),
                 isFavorite = true
             ),
             onClick = {},

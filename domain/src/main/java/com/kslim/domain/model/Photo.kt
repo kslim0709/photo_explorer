@@ -25,7 +25,9 @@ data class User(
     val bio: String,
     val location: String,
     val profileImage: ProfileImage? = null,
-    val links: UserLinks? = null
+    val links: UserLinks? = null,
+    val twitterUsername: String,
+    val instagramUsername: String
 ) {
 
     data class ProfileImage(

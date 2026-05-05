@@ -36,7 +36,9 @@ fun UserResponse.toDomain(): User {
         bio = this.bio,
         location = this.location,
         profileImage = this.profileImage?.toDomain(),
-        links = this.links?.toDomain()
+        links = this.links?.toDomain(),
+        twitterUsername = this.twitterUsername,
+        instagramUsername = this.instagramUsername
     )
 }
 

@@ -9,6 +9,7 @@ import com.kslim.data.remote.datasource.PhotoDataSource
 import com.kslim.data.remote.mapper.toDomain
 import com.kslim.domain.model.FavoritePhoto
 import com.kslim.domain.model.Photo
+import com.kslim.domain.model.PhotoDetail
 import com.kslim.domain.repository.PhotoRepository
 import com.kslim.domain.result.DataResult
 import kotlinx.coroutines.flow.Flow
@@ -31,8 +32,16 @@ class PhotoRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun getPhotoDetail(photoId: String): Photo {
-        TODO("Not yet implemented")
+    override suspend fun getPhotoDetail(photoId: String): DataResult<PhotoDetail> {
+        return when (val result = photoDataSource.getPhotoDetail(photoId)) {
+            is ApiResult.Failure -> DataResult.Failure(result.exception.toDataError())
+            is ApiResult.Success -> {
+                // API 응답 값 Photo 중 관심 Photo 존재 여부 체크
+                val favoriteIds = photoLocalDataSource.getFavoriteIds()
+
+                DataResult.Success(result.data.toDomain(isFavorite = photoId in favoriteIds))
+            }
+        }
     }
 
     // Database 내 관심 목록이 변경 되었을 경우 > 관심 목록 화면
@@ -52,7 +61,7 @@ class PhotoRepositoryImpl @Inject constructor(
         return runCatching {
             val favoritePhoto = photoLocalDataSource.getFavoritePhoto(photo.id)
 
-            if(favoritePhoto == null) {
+            if (favoritePhoto == null) {
                 photoLocalDataSource.insertFavorite(photo.toEntity())
             } else {
                 photoLocalDataSource.updateFavorite(photoId = photo.id, isFavorite = !favoritePhoto.isFavorite)

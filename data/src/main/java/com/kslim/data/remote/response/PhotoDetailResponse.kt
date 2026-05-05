@@ -7,9 +7,14 @@ import kotlinx.serialization.Serializable
 data class PhotoDetailResponse(
     @SerialName("id") val id: String = "",
     @SerialName("downloads") val downloads: Int = 0,
+    @SerialName("likes") val likes: Int = 0,
+    @SerialName("views") val views: Int = 0,
+    @SerialName("alt_description") val description: String = "",
     @SerialName("exif") val exif: ExifResponse? = null,
     @SerialName("location") val location: LocationResponse? = null,
     @SerialName("tags") val tags: List<TagResponse> = emptyList(),
+    @SerialName("urls") val urls: UrlsResponse? = null,
+    @SerialName("user") val user: UserResponse? = null,
 )
 
 @Serializable
