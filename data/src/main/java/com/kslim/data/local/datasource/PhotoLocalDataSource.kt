@@ -9,10 +9,10 @@ interface PhotoLocalDataSource {
     fun observeFavoritePhotos(): Flow<List<FavoritePhotoEntity>>
 
     suspend fun getFavoriteIds(): List<String>
-
-    suspend fun isFavorite(photoId: String): Boolean
+    suspend fun getFavoritePhoto(photoId: String): FavoritePhotoEntity?
 
     suspend fun insertFavorite(photo: FavoritePhotoEntity)
 
-    suspend fun deleteFavorite(photoId: String)
+    suspend fun updateFavorite(photoId: String, isFavorite: Boolean)
+    suspend fun updateLocalPath(photoId: String, path: String)
 }

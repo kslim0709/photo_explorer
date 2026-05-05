@@ -23,7 +23,7 @@ import javax.inject.Inject
 @HiltViewModel
 class PhotoFavoriteViewModel @Inject constructor(
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
-    private val observeFavoriteIdsUseCase: ObserveFavoritePhotosUseCase
+    private val observeFavoritePhotosUseCase: ObserveFavoritePhotosUseCase
 ) : ViewModel() {
 
     // UiState
@@ -59,7 +59,7 @@ class PhotoFavoriteViewModel @Inject constructor(
 
     private fun observeFavorites() {
         viewModelScope.launch {
-            observeFavoriteIdsUseCase().collectLatest { favorites ->
+            observeFavoritePhotosUseCase().collectLatest { favorites ->
                 _state.update {
                     it.copy(
                         photos = favorites.map { favorite ->

@@ -9,22 +9,26 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface FavoritePhotoDao {
-
-    @Query("SELECT id FROM favorite_photos")
+    @Query("SELECT id FROM favorite_photos WHERE isFavorite = 1")
     fun observeFavoriteIds(): Flow<List<String>>
 
-    @Query("SELECT * FROM favorite_photos")
+    @Query("SELECT * FROM favorite_photos WHERE isFavorite = 1")
     fun observeFavoritePhotos(): Flow<List<FavoritePhotoEntity>>
 
-    @Query("SELECT id FROM favorite_photos")
+    @Query("SELECT id FROM favorite_photos WHERE isFavorite = 1")
     suspend fun getFavoriteIds(): List<String>
 
-    @Query("SELECT EXISTS(SELECT 1 FROM favorite_photos WHERE id = :photoId)")
-    suspend fun isFavorite(photoId: String): Boolean
+    @Query("SELECT * FROM favorite_photos WHERE id = :photoId")
+    suspend fun getFavoritePhoto(photoId: String): FavoritePhotoEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(photo: FavoritePhotoEntity)
 
-    @Query("DELETE FROM favorite_photos WHERE id = :photoId")
-    suspend fun delete(photoId: String)
+    // 관심 여부 업데이트
+    @Query("UPDATE favorite_photos SET isFavorite = :isFavorite WHERE id = :photoId")
+    suspend fun updateFavorite(photoId: String, isFavorite: Boolean)
+
+    // 로컬 다운로드 경로 업데이트
+    @Query("UPDATE favorite_photos SET localPath = :path WHERE id = :photoId")
+    suspend fun updateLocalPath(photoId: String, path: String)
 }

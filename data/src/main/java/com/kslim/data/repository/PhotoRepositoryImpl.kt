@@ -50,11 +50,14 @@ class PhotoRepositoryImpl @Inject constructor(
 
     override suspend fun toggleFavorite(photo: FavoritePhoto): DataResult<Unit> {
         return runCatching {
-            if (photoLocalDataSource.isFavorite(photo.id)) {
-                photoLocalDataSource.deleteFavorite(photo.id)
-            } else {
+            val favoritePhoto = photoLocalDataSource.getFavoritePhoto(photo.id)
+
+            if(favoritePhoto == null) {
                 photoLocalDataSource.insertFavorite(photo.toEntity())
+            } else {
+                photoLocalDataSource.updateFavorite(photoId = photo.id, isFavorite = !favoritePhoto.isFavorite)
             }
+
             DataResult.Success(Unit)
         }.getOrElse {
             DataResult.Failure(it.toDataError())

@@ -28,7 +28,8 @@ sealed class PhotoUiModel(
         override val imageUrl: String,                // Urls 중 regular
         override val userName: String,                // User user name
         override val userProfileImageUrl: String,     // User profileImage > small url
-        override val isFavorite: Boolean = false
+        override val isFavorite: Boolean = false,
+        val localPath: String? = null
     ) : PhotoUiModel(id, imageUrl, userName, userProfileImageUrl, isFavorite)
 }
 
@@ -47,14 +48,16 @@ fun FavoritePhoto.toPhotoFavoriteUiModel() = PhotoUiModel.PhotoFavorite(
     imageUrl = this.imageUrl,
     userName = this.userName,
     userProfileImageUrl = this.userProfileImageUrl,
-    isFavorite = true
+    isFavorite = this.isFavorite,
+    localPath = this.localPath
 )
 
 fun PhotoUiModel.toFavoritePhoto(): FavoritePhoto {
     return FavoritePhoto(
-        id = id,
-        imageUrl = imageUrl,
-        userName = userName,
-        userProfileImageUrl = userProfileImageUrl
+        id = this.id,
+        imageUrl = this.imageUrl,
+        userName = this.userName,
+        userProfileImageUrl = this.userProfileImageUrl,
+        isFavorite = this.isFavorite,
     )
 }

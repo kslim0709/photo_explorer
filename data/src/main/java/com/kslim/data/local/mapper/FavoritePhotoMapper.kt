@@ -6,18 +6,22 @@ import com.kslim.domain.model.FavoritePhoto
 
 fun FavoritePhoto.toEntity(): FavoritePhotoEntity {
     return FavoritePhotoEntity(
-        id = id,
-        imageUrl = imageUrl,
-        userName = userName,
-        userProfileImageUrl = userProfileImageUrl
+        id = this.id,
+        imageUrl = this.imageUrl,
+        userName = this.userName,
+        userProfileImageUrl = this.userProfileImageUrl,
+        isFavorite = true,
+        localPath = this.localPath
     )
 }
 
 fun FavoritePhotoEntity.toDomain(): FavoritePhoto {
     return FavoritePhoto(
-        id = id,
-        imageUrl = imageUrl,
-        userName = userName,
-        userProfileImageUrl = userProfileImageUrl
+        id = this.id,
+        imageUrl = this.imageUrl,
+        userName = this.userName,
+        userProfileImageUrl = this.userProfileImageUrl,
+        isFavorite = this.isFavorite,
+        localPath = this.localPath
     )
 }

@@ -9,7 +9,6 @@ import javax.inject.Inject
 class PhotoLocalDataSourceImpl @Inject constructor(
     private val favoritePhotoDao: FavoritePhotoDao
 ) : PhotoLocalDataSource {
-
     override fun observeFavoriteIds(): Flow<List<String>> {
         return favoritePhotoDao.observeFavoriteIds()
     }
@@ -22,15 +21,19 @@ class PhotoLocalDataSourceImpl @Inject constructor(
         return favoritePhotoDao.getFavoriteIds()
     }
 
-    override suspend fun isFavorite(photoId: String): Boolean {
-        return favoritePhotoDao.isFavorite(photoId)
+    override suspend fun getFavoritePhoto(photoId: String): FavoritePhotoEntity? {
+        return favoritePhotoDao.getFavoritePhoto(photoId)
     }
 
     override suspend fun insertFavorite(photo: FavoritePhotoEntity) {
         favoritePhotoDao.insert(photo)
     }
 
-    override suspend fun deleteFavorite(photoId: String) {
-        favoritePhotoDao.delete(photoId)
+    override suspend fun updateFavorite(photoId: String, isFavorite: Boolean) {
+        favoritePhotoDao.updateFavorite(photoId, isFavorite)
+    }
+
+    override suspend fun updateLocalPath(photoId: String, path: String) {
+        favoritePhotoDao.updateLocalPath(photoId, path)
     }
 }
