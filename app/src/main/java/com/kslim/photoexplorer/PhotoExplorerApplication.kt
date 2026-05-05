@@ -26,7 +26,7 @@ class PhotoExplorerApplication : Application(), ImageLoaderFactory {
                     .maxSizeBytes(100L * 1024 * 1024)
                     .build()
             }
-            .respectCacheHeaders(false)
+            .respectCacheHeaders(true)
             .networkCachePolicy(CachePolicy.ENABLED)
             .diskCachePolicy(CachePolicy.ENABLED)
             .memoryCachePolicy(CachePolicy.ENABLED)

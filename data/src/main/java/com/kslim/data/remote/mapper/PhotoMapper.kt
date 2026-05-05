@@ -9,12 +9,13 @@ import com.kslim.domain.model.Urls
 import com.kslim.domain.model.User
 
 
-fun PhotoResponse.toDomain(): Photo {
+fun PhotoResponse.toDomain(isFavorite: Boolean = false): Photo {
     return Photo(id = this.id,
         urls = this.urls?.toDomain(),
         user = this.user?.toDomain(),
         width = this.width,
-        height = this.height
+        height = this.height,
+        isFavorite = isFavorite
     )
 }
 

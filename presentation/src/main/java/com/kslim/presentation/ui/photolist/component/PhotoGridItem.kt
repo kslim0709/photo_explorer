@@ -29,17 +29,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.AsyncImage
-import coil.request.ImageRequest
 import com.kslim.presentation.R
+import com.kslim.presentation.component.PhotoAsyncImage
 import com.kslim.presentation.theme.PhotoExplorerTheme
 import com.kslim.presentation.ui.photolist.model.PhotoUiModel
 
@@ -49,7 +45,6 @@ fun PhotoGridItem(
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
-    val context = LocalContext.current
 
     Card(
         modifier = Modifier
@@ -62,21 +57,12 @@ fun PhotoGridItem(
         )
     ) {
         Box(modifier = Modifier.fillMaxSize()) {
-            AsyncImage(
-                model = if (LocalInspectionMode.current) {
-                    R.drawable.ic_launcher_foreground
-                } else {
-                    ImageRequest.Builder(context)
-                        .data(photo.imageUrl)
-                        .crossfade(true)
-                        .build()
-                },
-                contentDescription = "Photo Image",
-                contentScale = ContentScale.Crop,
-                error = painterResource(R.drawable.ic_nodata),
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(Color.LightGray)
+            PhotoAsyncImage(
+                modifier = Modifier.fillMaxSize(),
+                imageUrl = photo.imageUrl,
+                contentDescription = stringResource(R.string.description_photo),
+                memoryCacheKey = photo.id,
+                contentScale = ContentScale.Crop
             )
 
             Row(
@@ -97,17 +83,8 @@ fun PhotoGridItem(
                     .align(Alignment.BottomEnd),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                AsyncImage(
-                    model = if (LocalInspectionMode.current) {
-                        R.drawable.ic_launcher_foreground
-                    } else {
-                        ImageRequest.Builder(context)
-                            .data(photo.userProfileImageUrl)
-                            .crossfade(true)
-                            .build()
-                    },
-                    contentDescription = photo.userName,
-                    error = painterResource(R.drawable.ic_nodata),
+
+                PhotoAsyncImage(
                     modifier = Modifier
                         .size(46.dp)
                         .clip(CircleShape)
@@ -116,13 +93,16 @@ fun PhotoGridItem(
                             color = Color.White,
                             shape = CircleShape
                         ),
+                    imageUrl = photo.userProfileImageUrl,
+                    contentDescription = stringResource(R.string.description_photo),
+                    memoryCacheKey = "${photo.id}_${photo.userProfileImageUrl}",
                     contentScale = ContentScale.Crop
                 )
 
                 Spacer(modifier = Modifier.width(10.dp))
 
                 Text(
-                    text = "by ${photo.userName}",
+                    text = photo.userName,
                     color = Color.White,
                     fontSize = 14.sp,
                     maxLines = 1,

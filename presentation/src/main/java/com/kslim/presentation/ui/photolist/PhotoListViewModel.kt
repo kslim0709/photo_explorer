@@ -4,12 +4,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.kslim.domain.result.DataResult
 import com.kslim.domain.usecase.GetPhotosUseCase
+import com.kslim.domain.usecase.ObserveFavoriteIdsUseCase
+import com.kslim.domain.usecase.ToggleFavoriteUseCase
 import com.kslim.presentation.ui.model.toUiMessage
+import com.kslim.presentation.ui.photolist.model.PhotoUiModel
+import com.kslim.presentation.ui.photolist.model.toFavoritePhoto
 import com.kslim.presentation.ui.photolist.model.toPhotoUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -17,7 +22,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class PhotoListViewModel @Inject constructor(
-    private val getPhotosUseCase: GetPhotosUseCase
+    private val getPhotosUseCase: GetPhotosUseCase,
+    private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+    private val observeFavoriteIdsUseCase: ObserveFavoriteIdsUseCase
 ) : ViewModel() {
 
     // UiState
@@ -32,6 +39,7 @@ class PhotoListViewModel @Inject constructor(
         get() = _state.value
 
     init {
+        observeFavoriteIds()
         onIntent(PhotoListIntent.LoadPhotos)
     }
 
@@ -39,7 +47,7 @@ class PhotoListViewModel @Inject constructor(
         when (intent) {
             PhotoListIntent.LoadPhotos -> loadPhotos()
             PhotoListIntent.LoadMore -> loadMore()
-            is PhotoListIntent.ToggleFavorite -> TODO()
+            is PhotoListIntent.ToggleFavorite -> toggleFavorite(intent.photo)
         }
     }
 
@@ -109,14 +117,45 @@ class PhotoListViewModel @Inject constructor(
                         }
                     )
                 }
-                sendEffect(PhotoListSideEffect.ShowSnackBar(result.error.toUiMessage()))
+                sendSideEffect(PhotoListSideEffect.ShowSnackBar(result.error.toUiMessage()))
             }
         }
     }
 
+    // Photo 관심 토글
+    private fun toggleFavorite(photo: PhotoUiModel) {
+        viewModelScope.launch {
+            when (val result = toggleFavoriteUseCase.execute(photo.toFavoritePhoto())) {
+                is DataResult.Success -> Unit
+                is DataResult.Failure -> {
+                    sendSideEffect(PhotoListSideEffect.ShowSnackBar(result.error.toUiMessage()))
+                }
+            }
+        }
+    }
+
+    // Photo 관심 토들 되었을 경우, UI 상태 변경
+    private fun observeFavoriteIds() {
+        viewModelScope.launch {
+            observeFavoriteIdsUseCase()
+                .collectLatest { favoriteIds ->
+                    val favoriteIdSet = favoriteIds.toSet()
+
+                    _state.update { state ->
+                        state.copy(
+                            photos = state.photos.map { photo ->
+                                photo.copy(
+                                    isFavorite = photo.id in favoriteIdSet
+                                )
+                            }
+                        )
+                    }
+                }
+        }
+    }
 
 
-    private fun sendEffect(effect: PhotoListSideEffect) {
+    private fun sendSideEffect(effect: PhotoListSideEffect) {
         viewModelScope.launch {
             _sideEffect.send(effect)
         }

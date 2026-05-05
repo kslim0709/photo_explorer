@@ -5,7 +5,8 @@ data class Photo(
     val urls: Urls? = null,
     val user: User? = null,
     val width: Int = 0,
-    val height: Int = 0
+    val height: Int = 0,
+    val isFavorite: Boolean = false
 )
 
 data class Urls(

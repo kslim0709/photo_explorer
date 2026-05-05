@@ -82,6 +82,7 @@ fun PhotoListScreen(
                 onNavigateToDetail(photoId)
             },
             onFavoriteClick = { photo ->
+                viewModel.onIntent(PhotoListIntent.ToggleFavorite(photo))
             },
             onRetryClick = {
                 viewModel.onIntent(PhotoListIntent.LoadPhotos)
