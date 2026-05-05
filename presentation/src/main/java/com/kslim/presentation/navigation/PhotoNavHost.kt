@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.kslim.presentation.ui.photodetail.PhotoDetailScreen
 import com.kslim.presentation.ui.photofavorite.PhotoFavoriteScreen
 import com.kslim.presentation.ui.photolist.PhotoListScreen
 
@@ -43,6 +44,16 @@ fun PhotoNavHost(
                 },
                 onNavigateToDetail = { photoId ->
                     navController.navigate(PhotoScreenRoute.PhotoDetail(photoId = photoId))
+                }
+            )
+        }
+
+        // 상세 화면
+        composable<PhotoScreenRoute.PhotoDetail> {
+            PhotoDetailScreen(
+                onBackClick = {
+                    navController.popBackStack()
+
                 }
             )
         }
