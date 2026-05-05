@@ -1,10 +1,10 @@
 package com.kslim.presentation.ui.photolist
 
-import com.kslim.presentation.ui.photolist.model.PhotoUiModel
+import com.kslim.presentation.ui.model.PhotoUiModel
 
 
 data class PhotoListState(
-    val photos: List<PhotoUiModel> = emptyList(),
+    val photos: List<PhotoUiModel.PhotoList> = emptyList(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
     val page: Int = 1,
@@ -14,7 +14,7 @@ data class PhotoListState(
 sealed interface PhotoListIntent {
     data object LoadPhotos : PhotoListIntent
     data object LoadMore : PhotoListIntent
-    data class ToggleFavorite(val photo: PhotoUiModel) : PhotoListIntent
+    data class ToggleFavorite(val photo: PhotoUiModel.PhotoList) : PhotoListIntent
 }
 
 

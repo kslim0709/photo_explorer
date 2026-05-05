@@ -6,6 +6,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.kslim.presentation.ui.photofavorite.PhotoFavoriteScreen
 import com.kslim.presentation.ui.photolist.PhotoListScreen
 
 
@@ -19,6 +20,7 @@ fun PhotoNavHost(
         navController = navController,
         startDestination = PhotoScreenRoute.PhotoList
     ) {
+        // 메인 화면 ( Photo List )
         composable<PhotoScreenRoute.PhotoList> {
             PhotoListScreen(
                 onNavigateToDetail = { photoId ->
@@ -28,6 +30,19 @@ fun PhotoNavHost(
                 onNavigateToFavorite = {
                     navController.navigate(PhotoScreenRoute.PhotoFavorite)
 
+                }
+            )
+        }
+
+        // 솬심 목록 리스트
+        composable<PhotoScreenRoute.PhotoFavorite> {
+            PhotoFavoriteScreen(
+                onBackClick = {
+                    navController.popBackStack()
+
+                },
+                onNavigateToDetail = { photoId ->
+                    navController.navigate(PhotoScreenRoute.PhotoDetail(photoId = photoId))
                 }
             )
         }

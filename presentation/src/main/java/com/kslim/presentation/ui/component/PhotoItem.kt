@@ -1,4 +1,4 @@
-package com.kslim.presentation.ui.photolist.component
+package com.kslim.presentation.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -35,9 +35,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kslim.presentation.R
-import com.kslim.presentation.component.PhotoAsyncImage
 import com.kslim.presentation.theme.PhotoExplorerTheme
-import com.kslim.presentation.ui.photolist.model.PhotoUiModel
+import com.kslim.presentation.ui.model.PhotoUiModel
 
 @Composable
 fun PhotoGridItem(
@@ -68,7 +67,6 @@ fun PhotoGridItem(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-
                     .background(
                         Brush.verticalGradient(
                             colors = listOf(
@@ -78,15 +76,15 @@ fun PhotoGridItem(
                             startY = 300f
                         )
                     )
-                    .height(68.dp)
-                    .padding(horizontal = 12.dp)
+                    .height(52.dp)
+                    .padding(horizontal = 12.dp, vertical = 6.dp)
                     .align(Alignment.BottomEnd),
                 verticalAlignment = Alignment.CenterVertically
             ) {
 
                 PhotoAsyncImage(
                     modifier = Modifier
-                        .size(46.dp)
+                        .size(36.dp)
                         .clip(CircleShape)
                         .border(
                             width = 2.dp,
@@ -133,7 +131,7 @@ fun PhotoGridItem(
 fun PhotoGridItemPreview() {
     PhotoExplorerTheme {
         PhotoGridItem(
-            photo = PhotoUiModel(
+            photo = PhotoUiModel.PhotoList(
                 id = "1",
                 imageUrl = "",
                 userName = "Alex Smith",

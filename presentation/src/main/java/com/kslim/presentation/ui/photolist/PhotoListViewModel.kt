@@ -6,10 +6,10 @@ import com.kslim.domain.result.DataResult
 import com.kslim.domain.usecase.GetPhotosUseCase
 import com.kslim.domain.usecase.ObserveFavoriteIdsUseCase
 import com.kslim.domain.usecase.ToggleFavoriteUseCase
+import com.kslim.presentation.ui.model.PhotoUiModel
+import com.kslim.presentation.ui.model.toFavoritePhoto
+import com.kslim.presentation.ui.model.toPhotoListUiModel
 import com.kslim.presentation.ui.model.toUiMessage
-import com.kslim.presentation.ui.photolist.model.PhotoUiModel
-import com.kslim.presentation.ui.photolist.model.toFavoritePhoto
-import com.kslim.presentation.ui.photolist.model.toPhotoUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -69,7 +69,7 @@ class PhotoListViewModel @Inject constructor(
     private fun loadMore() {
         val state = currentState
 
-        if (state.isLoading || state.isLoadingMore ) return
+        if (state.isLoading || state.isLoadingMore) return
 
         viewModelScope.launch {
             val nextPage = state.page + 1
@@ -86,15 +86,11 @@ class PhotoListViewModel @Inject constructor(
     private suspend fun fetchPhotos(page: Int, isLoadMore: Boolean) {
         when (val result = getPhotosUseCase.execute(page = page)) {
             is DataResult.Success -> {
-                val newPhotos = result.data.map { model -> model.toPhotoUiModel() }
+                val newPhotos = result.data.map { model -> model.toPhotoListUiModel() }
 
                 _state.update {
                     it.copy(
-                        photos = if (isLoadMore) {
-                            it.photos + newPhotos
-                        } else {
-                            newPhotos
-                        },
+                        photos = if (isLoadMore) { it.photos + newPhotos } else { newPhotos },
                         page = page,
                         isLoading = false,
                         isLoadingMore = false,
@@ -110,11 +106,7 @@ class PhotoListViewModel @Inject constructor(
                     it.copy(
                         isLoading = false,
                         isLoadingMore = false,
-                        errorMessage = if (isLoadMore) {
-                            it.errorMessage
-                        } else {
-                            message
-                        }
+                        errorMessage = if (isLoadMore) { it.errorMessage } else { message }
                     )
                 }
                 sendSideEffect(PhotoListSideEffect.ShowSnackBar(result.error.toUiMessage()))

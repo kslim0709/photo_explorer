@@ -31,11 +31,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kslim.presentation.R
-import com.kslim.presentation.component.PhotoErrorContent
-import com.kslim.presentation.component.PhotoExplorerTopBar
 import com.kslim.presentation.theme.PhotoExplorerTheme
-import com.kslim.presentation.ui.photolist.component.PhotoGridItem
-import com.kslim.presentation.ui.photolist.model.PhotoUiModel
+import com.kslim.presentation.ui.component.PhotoErrorContent
+import com.kslim.presentation.ui.component.PhotoExplorerTopBar
+import com.kslim.presentation.ui.component.PhotoGridItem
+import com.kslim.presentation.ui.model.PhotoUiModel
 
 
 @Composable
@@ -63,7 +63,7 @@ fun PhotoListScreen(
         },
         topBar = {
             PhotoExplorerTopBar(
-                title = "Photo Explorer",
+                title = stringResource(R.string.title_home),
                 actions = {
                     IconButton(onClick = onNavigateToFavorite) {
                         Icon(
@@ -99,7 +99,7 @@ fun PhotoListContent(
     modifier: Modifier = Modifier,
     state: PhotoListState,
     onPhotoClick: (String) -> Unit,
-    onFavoriteClick: (PhotoUiModel) -> Unit,
+    onFavoriteClick: (PhotoUiModel.PhotoList) -> Unit,
     onRetryClick: () -> Unit,
     onLoadMore: () -> Unit
 ) {
@@ -119,6 +119,7 @@ fun PhotoListContent(
             ) {
                 PhotoErrorContent(
                     message = state.errorMessage,
+                    showRetryButton = true,
                     onRetryClick = onRetryClick
                 )
             }
@@ -130,8 +131,7 @@ fun PhotoListContent(
                 contentAlignment = Alignment.Center
             ) {
                 PhotoErrorContent(
-                    message = stringResource(R.string.error_photo_list_empty),
-                    onRetryClick = onRetryClick
+                    message = stringResource(R.string.info_photo_list_empty),
                 )
             }
         }
@@ -197,9 +197,24 @@ fun PhotoListContent(
     }
 }
 
+
 @Preview(showBackground = true)
 @Composable
 fun PhotoListContentPreview() {
+    PhotoExplorerTheme {
+        PhotoListContent(
+            state = PhotoListState(photos = emptyList()),
+            onPhotoClick = {},
+            onFavoriteClick = {},
+            onRetryClick = {},
+            onLoadMore = {})
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun PhotoListEmptyContentPreview() {
     PhotoExplorerTheme {
         PhotoListContent(
             state = PhotoListState(photos = emptyList(), errorMessage = "data error"),

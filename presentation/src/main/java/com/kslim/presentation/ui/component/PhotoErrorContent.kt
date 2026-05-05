@@ -1,4 +1,4 @@
-package com.kslim.presentation.component
+package com.kslim.presentation.ui.component
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -19,7 +19,8 @@ import com.kslim.presentation.R
 @Composable
 fun PhotoErrorContent(
     message: String,
-    onRetryClick: () -> Unit
+    showRetryButton: Boolean = false,
+    onRetryClick: (() -> Unit)? = null
 ) {
     Column(
         modifier = Modifier
@@ -30,10 +31,14 @@ fun PhotoErrorContent(
     ) {
         Text(text = message)
 
-        Spacer(modifier = Modifier.height(12.dp))
+        if (showRetryButton) {
+            Spacer(modifier = Modifier.height(12.dp))
 
-        Button(onClick = onRetryClick) {
-            Text(text = stringResource(R.string.retry))
+            onRetryClick?.let {
+                Button(onClick = it) {
+                    Text(text = stringResource(R.string.retry))
+                }
+            }
         }
     }
 }

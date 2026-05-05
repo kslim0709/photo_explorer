@@ -1,4 +1,4 @@
-package com.kslim.presentation.component
+package com.kslim.presentation.ui.component
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.icons.Icons
