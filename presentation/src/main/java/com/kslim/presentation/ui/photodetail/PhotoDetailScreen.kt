@@ -69,6 +69,8 @@ fun PhotoDetailScreen(
                 }
 
                 is PhotoDetailSideEffect.ShowSnackBar -> {
+                    snackBarHostState.currentSnackbarData?.dismiss()
+
                     coroutineScope.launch {
                         snackBarHostState.showSnackbar(effect.message)
                     }
@@ -197,8 +199,11 @@ fun PhotoDetailContent(
                             value = "%,d".format(photo.downloads),
                             icon = Icons.Default.Share
                         )
+
+                        val downloadStatus = if (photo.localPath == null) stringResource(R.string.photo_download) else stringResource(R.string.photo_download_complete)
+
                         DetailStatChip(
-                            value = stringResource(R.string.photo_download),
+                            value = downloadStatus,
                             icon = ImageVector.vectorResource(id = R.drawable.ic_download),
                             clickable = photo.localPath == null,
                             onClick = {
@@ -216,6 +221,13 @@ fun PhotoDetailContent(
                 Spacer(modifier = Modifier.height(14.dp))
 
                 UserInfoSection(photo = photo)
+            }
+
+            if(state.isDownloading) {
+                Box(modifier = modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center) {
+                    CircularProgressIndicator()
+                }
             }
         }
 

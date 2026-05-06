@@ -6,10 +6,10 @@ import com.kslim.domain.result.DataResult
 import com.kslim.domain.usecase.GetPhotosUseCase
 import com.kslim.domain.usecase.ObserveFavoriteIdsUseCase
 import com.kslim.domain.usecase.ToggleFavoriteUseCase
-import com.kslim.presentation.ui.model.PhotoUiModel
-import com.kslim.presentation.ui.model.toFavoritePhoto
-import com.kslim.presentation.ui.model.toPhotoListUiModel
 import com.kslim.presentation.ui.model.toUiMessage
+import com.kslim.presentation.ui.photolist.model.PhotoListUiModel
+import com.kslim.presentation.ui.photolist.model.toFavoritePhoto
+import com.kslim.presentation.ui.photolist.model.toPhotoListUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -116,7 +116,7 @@ class PhotoListViewModel @Inject constructor(
     }
 
     // Photo 관심 토글
-    private fun toggleFavorite(photo: PhotoUiModel) {
+    private fun toggleFavorite(photo: PhotoListUiModel) {
         viewModelScope.launch(Dispatchers.IO) {
             when (val result = toggleFavoriteUseCase.execute(photo.toFavoritePhoto())) {
                 is DataResult.Success -> Unit

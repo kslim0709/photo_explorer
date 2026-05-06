@@ -36,7 +36,7 @@ import com.kslim.presentation.theme.PhotoExplorerTheme
 import com.kslim.presentation.ui.component.PhotoErrorContent
 import com.kslim.presentation.ui.component.PhotoExplorerTopBar
 import com.kslim.presentation.ui.component.PhotoGridItem
-import com.kslim.presentation.ui.model.PhotoUiModel
+import com.kslim.presentation.ui.photolist.model.PhotoListUiModel
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
@@ -110,7 +110,7 @@ fun PhotoListContent(
     modifier: Modifier = Modifier,
     state: PhotoListState,
     onPhotoClick: (String) -> Unit,
-    onFavoriteClick: (PhotoUiModel.PhotoList) -> Unit,
+    onFavoriteClick: (PhotoListUiModel) -> Unit,
     onRetryClick: () -> Unit,
     onLoadMore: () -> Unit
 ) {

@@ -28,11 +28,12 @@ fun DetailStatChip(
     clickable: Boolean = true,
     onClick: (() -> Unit)? = null
 ) {
+    val surfaceBg = if (clickable) Color(0xFF22252A) else Color(0xFF4B5563)
     Surface(
         modifier = Modifier.clickable(enabled = clickable) {
             onClick?.invoke()
         },
-        color = Color(0xFF22252A),
+        color = surfaceBg,
         shape = RoundedCornerShape(999.dp)
     ) {
         Row(

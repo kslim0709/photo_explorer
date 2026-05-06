@@ -7,8 +7,8 @@ import com.kslim.domain.usecase.ObserveFavoritePhotosUseCase
 import com.kslim.domain.usecase.ToggleFavoriteUseCase
 import com.kslim.presentation.ui.model.PhotoUiModel
 import com.kslim.presentation.ui.model.toFavoritePhoto
-import com.kslim.presentation.ui.model.toPhotoFavoriteUiModel
 import com.kslim.presentation.ui.model.toUiMessage
+import com.kslim.presentation.ui.photofavorite.model.toPhotoFavoriteUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel

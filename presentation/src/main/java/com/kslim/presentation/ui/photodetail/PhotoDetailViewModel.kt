@@ -11,10 +11,10 @@ import com.kslim.domain.usecase.GetPhotoDetailUseCase
 import com.kslim.domain.usecase.ObserveFavoriteIdsUseCase
 import com.kslim.domain.usecase.ToggleFavoriteUseCase
 import com.kslim.presentation.navigation.PhotoScreenRoute
-import com.kslim.presentation.ui.model.PhotoUiModel
 import com.kslim.presentation.ui.model.toFavoritePhoto
-import com.kslim.presentation.ui.model.toPhotoDetailUiModel
 import com.kslim.presentation.ui.model.toUiMessage
+import com.kslim.presentation.ui.photodetail.model.PhotoDetailUiModel
+import com.kslim.presentation.ui.photodetail.model.toPhotoDetailUiModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
@@ -98,7 +98,7 @@ class PhotoDetailViewModel @Inject constructor(
         }
     }
 
-    private fun toggleFavorite(photo: PhotoUiModel) {
+    private fun toggleFavorite(photo: PhotoDetailUiModel) {
         viewModelScope.launch(Dispatchers.IO) {
             when (val result = toggleFavoriteUseCase.execute(photo.toFavoritePhoto())) {
                 is DataResult.Success -> Unit
@@ -128,17 +128,18 @@ class PhotoDetailViewModel @Inject constructor(
             return
         }
 
+        _state.update { it.copy(isDownloading = true) }
         sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 다운로드를 시작합니다."))
 
         viewModelScope.launch(Dispatchers.IO) {
             when (val result = downloadPhotoUseCase.execute(photo.toFavoritePhoto())) {
                 is DataResult.Failure -> {
+                    _state.update { it.copy(isDownloading = false) }
                     sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 다운로드를 실패했습니다."))
                 }
                 is DataResult.Success -> {
-                    Log.d("kslim", "photoDownload ${result.data}")
                     _state.update {
-                        it.copy(it.photo?.copy(localPath = result.data))
+                        it.copy(photo = it.photo?.copy(localPath = result.data), isDownloading = false)
                     }
                     sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 다운로드가 완료되었습니다."))
                 }

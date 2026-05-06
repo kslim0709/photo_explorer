@@ -1,10 +1,14 @@
 package com.kslim.presentation.ui.photodetail
 
-import com.kslim.presentation.ui.model.PhotoUiModel
+import androidx.compose.runtime.Immutable
+import com.kslim.presentation.ui.photodetail.model.PhotoDetailUiModel
 
+
+@Immutable
 data class PhotoDetailState(
-    val photo: PhotoUiModel.PhotoDetail? = null,
+    val photo: PhotoDetailUiModel? = null,
     val isLoading: Boolean = false,
+    val isDownloading: Boolean = false,
     val errorMessage: String? = null
 )
 
@@ -13,7 +17,7 @@ sealed interface PhotoDetailIntent {
     data object DownloadPhoto : PhotoDetailIntent
     data object PermissionDenied : PhotoDetailIntent
 
-    data class ToggleFavorite(val photo: PhotoUiModel.PhotoDetail) : PhotoDetailIntent
+    data class ToggleFavorite(val photo: PhotoDetailUiModel) : PhotoDetailIntent
 }
 
 sealed interface PhotoDetailSideEffect {

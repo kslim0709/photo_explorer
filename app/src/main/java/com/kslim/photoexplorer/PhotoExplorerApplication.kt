@@ -23,7 +23,7 @@ class PhotoExplorerApplication : Application(), ImageLoaderFactory {
             .memoryCachePolicy(CachePolicy.ENABLED)
             .diskCachePolicy(CachePolicy.DISABLED)
             .crossfade(300)
-            .respectCacheHeaders(true)
+            .respectCacheHeaders(false) // unsplash cache 정책 보다 coil cache 정책 우선
             .build()
     }
 }

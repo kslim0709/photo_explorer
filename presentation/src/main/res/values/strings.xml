@@ -22,5 +22,5 @@
 
     <string name="retry">다시 시도</string>
     <string name="photo_download">다운로드</string>
-
+    <string name="photo_download_complete">다운로드 완료</string>
 </resources>

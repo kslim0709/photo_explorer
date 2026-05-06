@@ -38,6 +38,7 @@ import com.kslim.presentation.R
 import com.kslim.presentation.theme.PhotoExplorerTheme
 import com.kslim.presentation.ui.model.PhotoUiModel
 import com.kslim.presentation.ui.model.PhotoUserProfile
+import com.kslim.presentation.ui.photolist.model.PhotoListUiModel
 
 @Composable
 fun PhotoGridItem(
@@ -45,12 +46,6 @@ fun PhotoGridItem(
     onClick: () -> Unit,
     onFavoriteClick: () -> Unit
 ) {
-
-    val photoImageUrl = when(photo){
-        is PhotoUiModel.PhotoList -> photo.imageUrl
-        is PhotoUiModel.PhotoFavorite -> photo.localPath ?: photo.imageUrl
-        is PhotoUiModel.PhotoDetail -> photo.localPath ?: photo.imageUrl
-    }
 
     Card(
         modifier = Modifier
@@ -65,7 +60,7 @@ fun PhotoGridItem(
         Box(modifier = Modifier.fillMaxSize()) {
             PhotoAsyncImage(
                 modifier = Modifier.fillMaxSize(),
-                imageUrl = photoImageUrl,
+                imageUrl = photo.imageUrl,
                 contentDescription = stringResource(R.string.description_photo),
                 memoryCacheKey = photo.id,
                 contentScale = ContentScale.Crop
@@ -100,7 +95,7 @@ fun PhotoGridItem(
                         ),
                     imageUrl = photo.userProfile.profileImageUrl,
                     contentDescription = stringResource(R.string.description_photo),
-                    memoryCacheKey = "${photo.id}_${photo.userProfile.profileImageUrl}",
+                    memoryCacheKey = "${photo.id}_${photo.userProfile.name}",
                     contentScale = ContentScale.Crop,
                     placeholderRes = R.drawable.ic_account_box
                 )
@@ -139,7 +134,7 @@ fun PhotoGridItem(
 fun PhotoGridItemPreview() {
     PhotoExplorerTheme {
         PhotoGridItem(
-            photo = PhotoUiModel.PhotoList(
+            photo = PhotoListUiModel(
                 id = "1",
                 imageUrl = "",
                 userProfile = PhotoUserProfile(

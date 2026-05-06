@@ -1,10 +1,12 @@
 package com.kslim.presentation.ui.photolist
 
-import com.kslim.presentation.ui.model.PhotoUiModel
+import androidx.compose.runtime.Immutable
+import com.kslim.presentation.ui.photolist.model.PhotoListUiModel
 
 
+@Immutable
 data class PhotoListState(
-    val photos: List<PhotoUiModel.PhotoList> = emptyList(),
+    val photos: List<PhotoListUiModel> = emptyList(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
     val page: Int = 1,
@@ -14,7 +16,7 @@ data class PhotoListState(
 sealed interface PhotoListIntent {
     data object LoadPhotos : PhotoListIntent
     data object LoadMore : PhotoListIntent
-    data class ToggleFavorite(val photo: PhotoUiModel.PhotoList) : PhotoListIntent
+    data class ToggleFavorite(val photo: PhotoListUiModel) : PhotoListIntent
 }
 
 

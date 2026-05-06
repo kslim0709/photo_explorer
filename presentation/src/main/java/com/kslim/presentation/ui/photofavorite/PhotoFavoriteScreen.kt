@@ -26,7 +26,7 @@ import com.kslim.presentation.R
 import com.kslim.presentation.ui.component.PhotoErrorContent
 import com.kslim.presentation.ui.component.PhotoExplorerTopBar
 import com.kslim.presentation.ui.component.PhotoGridItem
-import com.kslim.presentation.ui.model.PhotoUiModel
+import com.kslim.presentation.ui.photofavorite.model.PhotoFavoriteUiModel
 import kotlinx.coroutines.launch
 
 @Composable
@@ -90,7 +90,7 @@ private fun PhotoFavoriteContent(
     modifier: Modifier = Modifier,
     state: PhotoFavoriteState,
     onPhotoClick: (String) -> Unit,
-    onFavoriteClick: (PhotoUiModel.PhotoFavorite) -> Unit
+    onFavoriteClick: (PhotoFavoriteUiModel) -> Unit
 ) {
     when {
         // 첫 진입 시, 로딩

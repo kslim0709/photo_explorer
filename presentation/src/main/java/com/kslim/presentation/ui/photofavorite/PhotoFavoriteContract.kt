@@ -1,17 +1,18 @@
 package com.kslim.presentation.ui.photofavorite
 
-import com.kslim.presentation.ui.model.PhotoUiModel
+import androidx.compose.runtime.Immutable
+import com.kslim.presentation.ui.photofavorite.model.PhotoFavoriteUiModel
 
-
+@Immutable
 data class PhotoFavoriteState(
-    val photos: List<PhotoUiModel.PhotoFavorite> = emptyList(),
+    val photos: List<PhotoFavoriteUiModel> = emptyList(),
     val isLoading: Boolean = false
 )
 
 sealed interface PhotoFavoriteIntent {
     data object ClickBack : PhotoFavoriteIntent
     data class ClickPhoto(val photoId: String) : PhotoFavoriteIntent
-    data class ToggleFavorite(val photo: PhotoUiModel.PhotoFavorite) : PhotoFavoriteIntent
+    data class ToggleFavorite(val photo: PhotoFavoriteUiModel) : PhotoFavoriteIntent
 }
 
 

@@ -10,6 +10,7 @@ import androidx.compose.ui.res.painterResource
 import coil.compose.AsyncImage
 import coil.request.CachePolicy
 import coil.request.ImageRequest
+import coil.size.Precision
 import com.kslim.presentation.R
 
 
@@ -31,6 +32,7 @@ fun PhotoAsyncImage(
             .data(imageUrl)
             .memoryCacheKey(memoryCacheKey)
             .diskCachePolicy(CachePolicy.DISABLED)
+            .precision(Precision.INEXACT)
             .crossfade(false)
             .build()
     }

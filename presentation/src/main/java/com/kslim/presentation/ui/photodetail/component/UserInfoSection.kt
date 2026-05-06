@@ -27,11 +27,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.kslim.presentation.R
 import com.kslim.presentation.ui.component.PhotoAsyncImage
-import com.kslim.presentation.ui.model.PhotoUiModel
+import com.kslim.presentation.ui.photodetail.model.PhotoDetailUiModel
 
 @Composable
 fun UserInfoSection(
-    photo: PhotoUiModel.PhotoDetail
+    photo: PhotoDetailUiModel
 ) {
     Box(
         modifier = Modifier
