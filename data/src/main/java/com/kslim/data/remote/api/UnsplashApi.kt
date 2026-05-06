@@ -1,11 +1,15 @@
 package com.kslim.data.remote.api
 
 import com.kslim.data.remote.response.PhotoDetailResponse
+import com.kslim.data.remote.response.PhotoDownloadResponse
 import com.kslim.data.remote.response.PhotoResponse
-import com.kslim.data.remote.response.PhotoStatisticResponse
+import okhttp3.ResponseBody
+import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
+import retrofit2.http.Streaming
+import retrofit2.http.Url
 
 interface UnsplashApi {
 
@@ -20,8 +24,12 @@ interface UnsplashApi {
         @Path("id") id: String
     ): PhotoDetailResponse
 
-    @GET("/photos/{id}/statistics")
-    suspend fun getPhotoStatistics(
+    @GET("/photos/{id}/download")
+    suspend fun getPhotoDownload(
         @Path("id") id: String
-    ): PhotoStatisticResponse
+    ): PhotoDownloadResponse
+
+    @GET
+    @Streaming
+    suspend fun downloadPhoto(@Url downloadUrl: String): Response<ResponseBody>
 }

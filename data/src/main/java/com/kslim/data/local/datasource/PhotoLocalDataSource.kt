@@ -14,5 +14,8 @@ interface PhotoLocalDataSource {
     suspend fun insertFavorite(photo: FavoritePhotoEntity)
 
     suspend fun updateFavorite(photoId: String, isFavorite: Boolean)
-    suspend fun updateLocalPath(photoId: String, path: String)
+    suspend fun updateLocalPath(photoId: String, path: String, isFavorite: Boolean)
+
+    // 로컬에 사진 저장
+    suspend fun savePhoto(photoName: String, bytes: ByteArray): String?
 }

@@ -6,7 +6,7 @@ import com.kslim.domain.model.PhotoDetail
 import com.kslim.domain.model.PhotoTag
 
 
-fun PhotoDetailResponse.toDomain(isFavorite: Boolean = false): PhotoDetail {
+fun PhotoDetailResponse.toDomain(): PhotoDetail {
     return PhotoDetail(
         id = this.id,
         likes = this.likes,
@@ -16,7 +16,6 @@ fun PhotoDetailResponse.toDomain(isFavorite: Boolean = false): PhotoDetail {
         urls = this.urls?.toDomain(),
         user = this.user?.toDomain(),
         tags = this.tags.map { it.toDomain() },
-        isFavorite = isFavorite
     )
 }
 

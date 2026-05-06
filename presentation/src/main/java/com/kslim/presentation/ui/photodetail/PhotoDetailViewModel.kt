@@ -1,10 +1,12 @@
 package com.kslim.presentation.ui.photodetail
 
+import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kslim.domain.result.DataResult
+import com.kslim.domain.usecase.DownloadPhotoUseCase
 import com.kslim.domain.usecase.GetPhotoDetailUseCase
 import com.kslim.domain.usecase.ObserveFavoriteIdsUseCase
 import com.kslim.domain.usecase.ToggleFavoriteUseCase
@@ -31,7 +33,8 @@ class PhotoDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getPhotoDetailUseCase: GetPhotoDetailUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
-    private val observeFavoriteIdsUseCase: ObserveFavoriteIdsUseCase
+    private val observeFavoriteIdsUseCase: ObserveFavoriteIdsUseCase,
+    private val downloadPhotoUseCase: DownloadPhotoUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(PhotoDetailState())
     val state: StateFlow<PhotoDetailState> = _state.asStateFlow()
@@ -54,6 +57,10 @@ class PhotoDetailViewModel @Inject constructor(
         when (intent) {
             PhotoDetailIntent.ClickBack -> {
                 sendSideEffect(PhotoDetailSideEffect.NavigateBack)
+            }
+            PhotoDetailIntent.DownloadPhoto -> photoDownload()
+            PhotoDetailIntent.PermissionDenied -> {
+                sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 저장 권한이 필요합니다."))
             }
             is PhotoDetailIntent.ToggleFavorite -> {
                 toggleFavorite(intent.photo)
@@ -92,7 +99,7 @@ class PhotoDetailViewModel @Inject constructor(
     }
 
     private fun toggleFavorite(photo: PhotoUiModel) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (val result = toggleFavoriteUseCase.execute(photo.toFavoritePhoto())) {
                 is DataResult.Success -> Unit
                 is DataResult.Failure -> {
@@ -103,12 +110,37 @@ class PhotoDetailViewModel @Inject constructor(
     }
 
     private fun observeFavoriteIds() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             observeFavoriteIdsUseCase().collectLatest { favoriteIds ->
                 _state.update {
                     it.copy(
                         photo = it.photo?.copy(isFavorite = it.photo.id in favoriteIds)
                     )
+                }
+            }
+        }
+    }
+
+    // 사진 다운로드
+    private fun photoDownload() {
+        val photo = _state.value.photo ?: run {
+            sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 다운로드를 실패했습니다."))
+            return
+        }
+
+        sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 다운로드를 시작합니다."))
+
+        viewModelScope.launch(Dispatchers.IO) {
+            when (val result = downloadPhotoUseCase.execute(photo.toFavoritePhoto())) {
+                is DataResult.Failure -> {
+                    sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 다운로드를 실패했습니다."))
+                }
+                is DataResult.Success -> {
+                    Log.d("kslim", "photoDownload ${result.data}")
+                    _state.update {
+                        it.copy(it.photo?.copy(localPath = result.data))
+                    }
+                    sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 다운로드가 완료되었습니다."))
                 }
             }
         }

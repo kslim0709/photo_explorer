@@ -2,7 +2,10 @@ package com.kslim.data.remote.datasource
 
 import com.kslim.data.network.result.ApiResult
 import com.kslim.data.remote.response.PhotoDetailResponse
+import com.kslim.data.remote.response.PhotoDownloadResponse
 import com.kslim.data.remote.response.PhotoResponse
+import okhttp3.ResponseBody
+import retrofit2.Response
 
 
 interface PhotoDataSource {
@@ -15,4 +18,12 @@ interface PhotoDataSource {
     suspend fun getPhotoDetail(
         photoId: String
     ): ApiResult<PhotoDetailResponse>
+
+    suspend fun getPhotoDownload(
+        photoId: String
+    ): ApiResult<PhotoDownloadResponse>
+
+    suspend fun downloadPhoto(
+        downloadUrl: String
+    ): Response<ResponseBody>
 }

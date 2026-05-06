@@ -9,7 +9,8 @@ data class PhotoDetail(
     val urls: Urls? = null,
     val user: User? = null,
     val tags: List<PhotoTag>,
-    val isFavorite: Boolean
+    val isFavorite: Boolean = false,
+    val localPath: String? = null
 )
 
 data class PhotoTag(

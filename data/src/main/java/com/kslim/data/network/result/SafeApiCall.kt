@@ -36,13 +36,13 @@ fun Throwable?.toDataError(): DataError {
             403 -> DataError.Forbidden
             404 -> DataError.NotFound
             in 500..599 -> DataError.Server
-            else -> DataError.Unknown(message)
+            else -> DataError.Unknown(message ?: "Unknow Error")
         }
 
         is UnknownHostException -> DataError.Network
         is SocketTimeoutException -> DataError.Timeout
         is IOException -> DataError.Network
 
-        else -> DataError.Unknown("Unknow Error")
+        else -> DataError.Unknown(message = this?.message ?: "Unknow Error")
     }
 }

@@ -11,6 +11,7 @@ import com.kslim.domain.model.FavoritePhoto
 import com.kslim.domain.model.Photo
 import com.kslim.domain.model.PhotoDetail
 import com.kslim.domain.repository.PhotoRepository
+import com.kslim.domain.result.DataError
 import com.kslim.domain.result.DataResult
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -37,9 +38,12 @@ class PhotoRepositoryImpl @Inject constructor(
             is ApiResult.Failure -> DataResult.Failure(result.exception.toDataError())
             is ApiResult.Success -> {
                 // API 응답 값 Photo 중 관심 Photo 존재 여부 체크
-                val favoriteIds = photoLocalDataSource.getFavoriteIds()
+                val favoritePhoto = photoLocalDataSource.getFavoritePhoto(photoId)
 
-                DataResult.Success(result.data.toDomain(isFavorite = photoId in favoriteIds))
+                DataResult.Success(data = result.data.toDomain().copy(
+                    isFavorite = favoritePhoto?.isFavorite ?: false,
+                    localPath = favoritePhoto?.localPath)
+                )
             }
         }
     }
@@ -70,6 +74,40 @@ class PhotoRepositoryImpl @Inject constructor(
             DataResult.Success(Unit)
         }.getOrElse {
             DataResult.Failure(it.toDataError())
+        }
+    }
+
+    // Photo Download
+    override suspend fun downloadPhoto(photo: FavoritePhoto): DataResult<String> {
+        return when (val result = photoDataSource.getPhotoDownload(photoId = photo.id)) {
+            is ApiResult.Failure -> DataResult.Failure(result.exception.toDataError())
+            is ApiResult.Success -> {
+                val response = photoDataSource.downloadPhoto(downloadUrl = result.data.downloadUrl)
+                val body = response.body()
+                           ?: return DataResult.Failure(DataError.Unknown("PhotoDownload body is nulll"))
+
+                if (!response.isSuccessful) {
+                    DataResult.Failure(DataError.Unknown("PhotoDownload Failed"))
+                } else {
+                    val photoName = "${photo.id}.jpg"
+
+                    val localPath = photoLocalDataSource.savePhoto(photoName, body.bytes())
+                                    ?: return DataResult.Failure(DataError.Unknown("PhotoSave Failed"))
+
+                    val favoritePhoto = photoLocalDataSource.getFavoritePhoto(photo.id)
+
+                    if (favoritePhoto == null) {
+                        photoLocalDataSource.insertFavorite(photo.toEntity().copy(
+                            localPath = localPath,
+                            isFavorite = true
+                        ))
+                    } else {
+                        photoLocalDataSource.updateLocalPath(photoId = photo.id, path = localPath, isFavorite = true)
+                    }
+                    DataResult.Success(localPath)
+
+                }
+            }
         }
     }
 }

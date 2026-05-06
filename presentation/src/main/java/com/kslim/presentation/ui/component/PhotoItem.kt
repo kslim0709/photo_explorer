@@ -46,6 +46,12 @@ fun PhotoGridItem(
     onFavoriteClick: () -> Unit
 ) {
 
+    val photoImageUrl = when(photo){
+        is PhotoUiModel.PhotoList -> photo.imageUrl
+        is PhotoUiModel.PhotoFavorite -> photo.localPath ?: photo.imageUrl
+        is PhotoUiModel.PhotoDetail -> photo.localPath ?: photo.imageUrl
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -59,7 +65,7 @@ fun PhotoGridItem(
         Box(modifier = Modifier.fillMaxSize()) {
             PhotoAsyncImage(
                 modifier = Modifier.fillMaxSize(),
-                imageUrl = photo.imageUrl,
+                imageUrl = photoImageUrl,
                 contentDescription = stringResource(R.string.description_photo),
                 memoryCacheKey = photo.id,
                 contentScale = ContentScale.Crop

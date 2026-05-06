@@ -10,6 +10,7 @@ import com.kslim.presentation.ui.model.toFavoritePhoto
 import com.kslim.presentation.ui.model.toPhotoFavoriteUiModel
 import com.kslim.presentation.ui.model.toUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -58,7 +59,7 @@ class PhotoFavoriteViewModel @Inject constructor(
 
 
     private fun observeFavorites() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             observeFavoritePhotosUseCase().collectLatest { favorites ->
                 _state.update {
                     it.copy(
@@ -77,7 +78,7 @@ class PhotoFavoriteViewModel @Inject constructor(
 
     // Photo 관심 토글
     private fun toggleFavorite(photo: PhotoUiModel) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (val result = toggleFavoriteUseCase.execute(photo.toFavoritePhoto())) {
                 is DataResult.Success -> Unit
                 is DataResult.Failure -> {

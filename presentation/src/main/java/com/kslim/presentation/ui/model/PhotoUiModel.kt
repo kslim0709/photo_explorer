@@ -15,7 +15,7 @@ sealed class PhotoUiModel(
     @Immutable
     data class PhotoList(
         override val id: String,
-        override val imageUrl: String,                              // Urls 중 regular
+        override val imageUrl: String,                              // Urls 중 small
         override val userProfile: PhotoUserProfile,
         override val isFavorite: Boolean = false
     ) : PhotoUiModel(id, imageUrl, userProfile, isFavorite)
@@ -24,7 +24,7 @@ sealed class PhotoUiModel(
     @Immutable
     data class PhotoFavorite(
         override val id: String,
-        override val imageUrl: String,                // Urls 중 regular
+        override val imageUrl: String,                // Urls 중 small
         override val userProfile: PhotoUserProfile,
         override val isFavorite: Boolean = false,
         val localPath: String? = null
@@ -39,14 +39,15 @@ sealed class PhotoUiModel(
         val description: String,
         val likes: Int,
         val downloads: Int,
-        val tags: List<String>
+        val tags: List<String>,
+        val localPath: String? = null
     ) : PhotoUiModel(id, imageUrl, userProfile, isFavorite)
 }
 
 // Photo Main 화면 UiModel
 fun Photo.toPhotoListUiModel() = PhotoUiModel.PhotoList(
     id = this.id,
-    imageUrl = this.urls?.regular ?: "",
+    imageUrl = this.urls?.small ?: "",
     userProfile = PhotoUserProfile(
         name = this.user?.username ?: "",
         profileImageUrl = this.user?.profileImage?.small ?: ""
@@ -80,7 +81,8 @@ fun PhotoDetail.toPhotoDetailUiModel() = PhotoUiModel.PhotoDetail(
     likes = this.likes,
     downloads = this.downloads,
     description = this.description,
-    tags = this.tags.map { it.title }
+    tags = this.tags.map { it.title },
+    localPath = this.localPath
 )
 
 fun PhotoUiModel.toFavoritePhoto(): FavoritePhoto {

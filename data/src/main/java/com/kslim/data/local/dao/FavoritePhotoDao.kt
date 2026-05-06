@@ -29,6 +29,6 @@ interface FavoritePhotoDao {
     suspend fun updateFavorite(photoId: String, isFavorite: Boolean)
 
     // 로컬 다운로드 경로 업데이트
-    @Query("UPDATE favorite_photos SET localPath = :path WHERE id = :photoId")
-    suspend fun updateLocalPath(photoId: String, path: String)
+    @Query("UPDATE favorite_photos SET localPath = :path, isFavorite =:isFavorite  WHERE id = :photoId")
+    suspend fun updateLocalPath(photoId: String, path: String, isFavorite: Boolean)
 }

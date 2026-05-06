@@ -11,6 +11,7 @@ import com.kslim.presentation.ui.model.toFavoritePhoto
 import com.kslim.presentation.ui.model.toPhotoListUiModel
 import com.kslim.presentation.ui.model.toUiMessage
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -52,7 +53,7 @@ class PhotoListViewModel @Inject constructor(
     }
 
     fun loadPhotos() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             _state.update {
                 it.copy(
                     page = 1,
@@ -71,7 +72,7 @@ class PhotoListViewModel @Inject constructor(
 
         if (state.isLoading || state.isLoadingMore) return
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             val nextPage = state.page + 1
 
             _state.update {
@@ -116,7 +117,7 @@ class PhotoListViewModel @Inject constructor(
 
     // Photo 관심 토글
     private fun toggleFavorite(photo: PhotoUiModel) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             when (val result = toggleFavoriteUseCase.execute(photo.toFavoritePhoto())) {
                 is DataResult.Success -> Unit
                 is DataResult.Failure -> {
@@ -128,7 +129,7 @@ class PhotoListViewModel @Inject constructor(
 
     // Photo 관심 토들 되었을 경우, UI 상태 변경
     private fun observeFavoriteIds() {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             observeFavoriteIdsUseCase()
                 .collectLatest { favoriteIds ->
                     val favoriteIdSet = favoriteIds.toSet()

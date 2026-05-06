@@ -3,7 +3,6 @@ package com.kslim.photoexplorer
 import android.app.Application
 import coil.ImageLoader
 import coil.ImageLoaderFactory
-import coil.disk.DiskCache
 import coil.memory.MemoryCache
 import coil.request.CachePolicy
 import dagger.hilt.android.HiltAndroidApp
@@ -19,19 +18,12 @@ class PhotoExplorerApplication : Application(), ImageLoaderFactory {
                     .maxSizePercent(0.20)
                     .build()
             }
-            .diskCache {
-                // 디스크 캐시 최적화 (최대 100MB 제한)
-                DiskCache.Builder()
-                    .directory(cacheDir.resolve("image_cache"))
-                    .maxSizeBytes(100L * 1024 * 1024)
-                    .build()
-            }
-            .respectCacheHeaders(true)
+            .diskCache(null)
             .networkCachePolicy(CachePolicy.ENABLED)
-            .diskCachePolicy(CachePolicy.ENABLED)
             .memoryCachePolicy(CachePolicy.ENABLED)
-            .crossfade(true)
+            .diskCachePolicy(CachePolicy.DISABLED)
             .crossfade(300)
+            .respectCacheHeaders(true)
             .build()
     }
 }

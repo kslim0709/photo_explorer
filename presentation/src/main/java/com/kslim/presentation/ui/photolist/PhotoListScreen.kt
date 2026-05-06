@@ -20,10 +20,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,6 +37,8 @@ import com.kslim.presentation.ui.component.PhotoErrorContent
 import com.kslim.presentation.ui.component.PhotoExplorerTopBar
 import com.kslim.presentation.ui.component.PhotoGridItem
 import com.kslim.presentation.ui.model.PhotoUiModel
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
 
@@ -146,22 +148,23 @@ fun PhotoListContent(
         }
         else -> {
             val gridState = rememberLazyGridState()
-            val shouldLoadMore by remember {
-                derivedStateOf {
+
+            LaunchedEffect(gridState) {
+                snapshotFlow {
                     val layoutInfo = gridState.layoutInfo
-                    val totalItems = layoutInfo.totalItemsCount
-                    val lastVisibleItemIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+                    val lastVisibleIndex = layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: -1
+                    val totalCount = layoutInfo.totalItemsCount
 
                     // 마지먹 도달 전 미리 데이터 요청
-                    totalItems > 0 && lastVisibleItemIndex >= totalItems - 4
+                    totalCount > 0 && lastVisibleIndex >= totalCount - 4
                 }
-            }
-
-            LaunchedEffect(shouldLoadMore) {
-                // 중복 호출 방지
-                if (shouldLoadMore && !state.isLoadingMore && !state.isLoading) {
-                    onLoadMore()
-                }
+                    .distinctUntilChanged()
+                    .filter { it }
+                    .collect {
+                        if (!state.isLoadingMore && !state.isLoading) {
+                            onLoadMore()
+                        }
+                    }
             }
 
             LazyVerticalGrid(

@@ -1,5 +1,6 @@
 package com.kslim.presentation.ui.photodetail.component
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.padding
@@ -23,9 +24,14 @@ import com.kslim.presentation.R
 @Composable
 fun DetailStatChip(
     value: String,
-    icon: ImageVector
+    icon: ImageVector,
+    clickable: Boolean = true,
+    onClick: (() -> Unit)? = null
 ) {
     Surface(
+        modifier = Modifier.clickable(enabled = clickable) {
+            onClick?.invoke()
+        },
         color = Color(0xFF22252A),
         shape = RoundedCornerShape(999.dp)
     ) {

@@ -1,5 +1,9 @@
 package com.kslim.presentation.ui.photodetail
 
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,7 +35,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -54,7 +60,6 @@ fun PhotoDetailScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
@@ -69,6 +74,16 @@ fun PhotoDetailScreen(
                     }
                 }
             }
+        }
+    }
+
+    val permissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        if (granted) {
+            viewModel.onIntent(PhotoDetailIntent.DownloadPhoto)
+        } else {
+            viewModel.onIntent(PhotoDetailIntent.PermissionDenied)
         }
     }
 
@@ -108,7 +123,15 @@ fun PhotoDetailScreen(
     ) { padding ->
         PhotoDetailContent(
             modifier = Modifier.padding(padding),
-            state = state
+            state = state,
+            onDownloadClick = {
+                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                    permissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                } else {
+                    viewModel.onIntent(PhotoDetailIntent.DownloadPhoto)
+
+                }
+            }
         )
 
     }
@@ -117,9 +140,9 @@ fun PhotoDetailScreen(
 @Composable
 fun PhotoDetailContent(
     modifier: Modifier,
-    state: PhotoDetailState
+    state: PhotoDetailState,
+    onDownloadClick: () -> Unit
 ) {
-
     when {
         state.isLoading -> {
             Box(modifier = modifier.fillMaxSize(),
@@ -142,6 +165,7 @@ fun PhotoDetailContent(
 
         state.photo != null -> {
             val photo = state.photo
+
             Column(
                 modifier = modifier
                     .fillMaxSize()
@@ -169,10 +193,17 @@ fun PhotoDetailContent(
                             value = "%,d".format(photo.likes),
                             icon = Icons.Default.Favorite
                         )
-
                         DetailStatChip(
                             value = "%,d".format(photo.downloads),
                             icon = Icons.Default.Share
+                        )
+                        DetailStatChip(
+                            value = stringResource(R.string.photo_download),
+                            icon = ImageVector.vectorResource(id = R.drawable.ic_download),
+                            clickable = photo.localPath == null,
+                            onClick = {
+                                onDownloadClick()
+                            }
                         )
                     }
                 }
@@ -201,3 +232,4 @@ fun PhotoDetailContent(
         }
     }
 }
+
