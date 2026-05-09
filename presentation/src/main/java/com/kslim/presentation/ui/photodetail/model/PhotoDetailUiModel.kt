@@ -14,8 +14,7 @@ data class PhotoDetailUiModel(
     val description: String,
     val likes: Int,
     val downloads: Int,
-    val tags: List<String>,
-    val localPath: String? = null
+    val tags: List<String>
 ) : PhotoUiModel
 
 // Photo Detail 화면 UiModel
@@ -33,5 +32,4 @@ fun PhotoDetail.toPhotoDetailUiModel() = PhotoDetailUiModel(
     downloads = this.downloads,
     description = this.description,
     tags = this.tags.map { it.title },
-    localPath = this.localPath
 )

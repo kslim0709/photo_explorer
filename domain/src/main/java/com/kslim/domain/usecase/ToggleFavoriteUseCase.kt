@@ -8,7 +8,7 @@ import javax.inject.Inject
 class ToggleFavoriteUseCase @Inject constructor(
     private val repository: PhotoRepository
 ) {
-    suspend fun execute(photo: FavoritePhoto): DataResult<Unit> {
+    suspend fun execute(photo: FavoritePhoto): DataResult<Boolean> {
         return repository.toggleFavorite(photo)
     }
 }

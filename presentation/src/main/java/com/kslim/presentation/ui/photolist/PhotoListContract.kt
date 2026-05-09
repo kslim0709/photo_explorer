@@ -9,6 +9,7 @@ data class PhotoListState(
     val photos: List<PhotoListUiModel> = emptyList(),
     val isLoading: Boolean = false,
     val isLoadingMore: Boolean = false,
+    val isDownloading: Boolean = false,
     val page: Int = 1,
     val errorMessage: String? = null
 )

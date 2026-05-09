@@ -1,5 +1,6 @@
 package com.kslim.presentation.ui.photolist
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -26,6 +27,8 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,6 +63,8 @@ fun PhotoListScreen(
                 PhotoListSideEffect.NavigateToFavorite -> onNavigateToFavorite()
                 is PhotoListSideEffect.NavigateToDetail -> onNavigateToDetail(effect.photoId)
                 is PhotoListSideEffect.ShowSnackBar -> {
+                    snackBarHostState.currentSnackbarData?.dismiss()
+
                     coroutineScope.launch {
                         snackBarHostState.showSnackbar(effect.message)
                     }
@@ -156,7 +161,7 @@ fun PhotoListContent(
                     val totalCount = layoutInfo.totalItemsCount
 
                     // 마지먹 도달 전 미리 데이터 요청
-                    totalCount > 0 && lastVisibleIndex >= totalCount - 4
+                    totalCount > 0 && lastVisibleIndex >= totalCount - 6
                 }
                     .distinctUntilChanged()
                     .filter { it }
@@ -167,41 +172,65 @@ fun PhotoListContent(
                     }
             }
 
-            LazyVerticalGrid(
-                modifier = modifier.fillMaxSize(),
-                state = gridState,
-                columns = GridCells.Fixed(2),
-                contentPadding = PaddingValues(12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
+            Box(
+                modifier = modifier.fillMaxSize())
+            {
+                LazyVerticalGrid(
+                    modifier = Modifier.fillMaxSize(),
+                    state = gridState,
+                    columns = GridCells.Fixed(2),
+                    contentPadding = PaddingValues(12.dp),
+                    verticalArrangement = Arrangement.spacedBy(12.dp),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
 
-                items(
-                    count = state.photos.size,
-                    key = { index -> "${state.photos[index].id}_${index}" }
-                ) { index ->
-                    val photo = state.photos[index]
+                    items(
+                        count = state.photos.size,
+                        key = { index -> "${state.photos[index].id}_${index}" }
+                    ) { index ->
+                        val photo = state.photos[index]
 
-                    PhotoGridItem(
-                        photo = photo,
-                        onClick = { onPhotoClick(photo.id) },
-                        onFavoriteClick = { onFavoriteClick(photo) }
-                    )
+                        PhotoGridItem(
+                            photo = photo,
+                            onClick = { onPhotoClick(photo.id) },
+                            onFavoriteClick = { onFavoriteClick(photo) }
+                        )
+                    }
+
+                    // 무한 스크롤, 로딩 바 노출
+                    if (state.isLoadingMore) {
+                        item(
+                            span = { GridItemSpan(maxLineSpan) }
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(20.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                CircularProgressIndicator()
+                            }
+                        }
+                    }
                 }
 
-                // 무한 스크롤, 로딩 바 노출
-                if (state.isLoadingMore) {
-                    item(
-                        span = { GridItemSpan(maxLineSpan) }
+                if (state.isDownloading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(
+                                Color.Black.copy(alpha = 0.2f)
+                            )
+                            .pointerInput(Unit) {
+                                awaitPointerEventScope {
+                                    while (true) {
+                                        awaitPointerEvent()
+                                    }
+                                }
+                            },
+                        contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(20.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            CircularProgressIndicator()
-                        }
+                        CircularProgressIndicator()
                     }
                 }
             }

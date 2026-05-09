@@ -25,15 +25,13 @@ import com.kslim.presentation.R
 fun DetailStatChip(
     value: String,
     icon: ImageVector,
-    clickable: Boolean = true,
     onClick: (() -> Unit)? = null
 ) {
-    val surfaceBg = if (clickable) Color(0xFF22252A) else Color(0xFF4B5563)
     Surface(
-        modifier = Modifier.clickable(enabled = clickable) {
+        modifier = Modifier.clickable {
             onClick?.invoke()
         },
-        color = surfaceBg,
+        color = Color(0xFF22252A) ,
         shape = RoundedCornerShape(999.dp)
     ) {
         Row(

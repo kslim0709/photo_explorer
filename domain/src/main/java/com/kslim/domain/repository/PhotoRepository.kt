@@ -9,8 +9,7 @@ import kotlinx.coroutines.flow.Flow
 interface PhotoRepository {
     suspend fun getPhotos(page: Int, perPage: Int): DataResult<List<Photo>>
     suspend fun getPhotoDetail(photoId: String): DataResult<PhotoDetail>
-    suspend fun toggleFavorite(photo: FavoritePhoto): DataResult<Unit>
-    suspend fun downloadPhoto(photo: FavoritePhoto): DataResult<String>
+    suspend fun toggleFavorite(photo: FavoritePhoto): DataResult<Boolean>
     fun observeFavoritePhotos(): Flow<List<FavoritePhoto>>
     fun observeFavoriteIds(): Flow<List<String>>
 }

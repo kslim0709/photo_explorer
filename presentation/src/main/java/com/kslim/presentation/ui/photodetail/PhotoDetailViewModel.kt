@@ -1,12 +1,10 @@
 package com.kslim.presentation.ui.photodetail
 
-import android.util.Log
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.toRoute
 import com.kslim.domain.result.DataResult
-import com.kslim.domain.usecase.DownloadPhotoUseCase
 import com.kslim.domain.usecase.GetPhotoDetailUseCase
 import com.kslim.domain.usecase.ObserveFavoriteIdsUseCase
 import com.kslim.domain.usecase.ToggleFavoriteUseCase
@@ -33,8 +31,7 @@ class PhotoDetailViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle,
     private val getPhotoDetailUseCase: GetPhotoDetailUseCase,
     private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
-    private val observeFavoriteIdsUseCase: ObserveFavoriteIdsUseCase,
-    private val downloadPhotoUseCase: DownloadPhotoUseCase
+    private val observeFavoriteIdsUseCase: ObserveFavoriteIdsUseCase
 ) : ViewModel() {
     private val _state = MutableStateFlow(PhotoDetailState())
     val state: StateFlow<PhotoDetailState> = _state.asStateFlow()
@@ -58,7 +55,6 @@ class PhotoDetailViewModel @Inject constructor(
             PhotoDetailIntent.ClickBack -> {
                 sendSideEffect(PhotoDetailSideEffect.NavigateBack)
             }
-            PhotoDetailIntent.DownloadPhoto -> photoDownload()
             PhotoDetailIntent.PermissionDenied -> {
                 sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 저장 권한이 필요합니다."))
             }
@@ -98,12 +94,22 @@ class PhotoDetailViewModel @Inject constructor(
         }
     }
 
+    // 사진 다운로드 및 관심 등록, 해제
     private fun toggleFavorite(photo: PhotoDetailUiModel) {
+        _state.update { it.copy(isDownloading = true) }
+
         viewModelScope.launch(Dispatchers.IO) {
             when (val result = toggleFavoriteUseCase.execute(photo.toFavoritePhoto())) {
-                is DataResult.Success -> Unit
+                is DataResult.Success -> {
+                    _state.update {
+                        it.copy(isDownloading = false)
+                    }
+                    val message = if(result.data) "좋아요!" else "좋아요 취소"
+                    sendSideEffect(PhotoDetailSideEffect.ShowSnackBar(message = message))
+                }
                 is DataResult.Failure -> {
-                    sendSideEffect(PhotoDetailSideEffect.ShowSnackBar(result.error.toUiMessage()))
+                    _state.update { it.copy(isDownloading = false) }
+                    sendSideEffect(PhotoDetailSideEffect.ShowSnackBar(message = result.error.toUiMessage()))
                 }
             }
         }
@@ -120,33 +126,6 @@ class PhotoDetailViewModel @Inject constructor(
             }
         }
     }
-
-    // 사진 다운로드
-    private fun photoDownload() {
-        val photo = _state.value.photo ?: run {
-            sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 다운로드를 실패했습니다."))
-            return
-        }
-
-        _state.update { it.copy(isDownloading = true) }
-        sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 다운로드를 시작합니다."))
-
-        viewModelScope.launch(Dispatchers.IO) {
-            when (val result = downloadPhotoUseCase.execute(photo.toFavoritePhoto())) {
-                is DataResult.Failure -> {
-                    _state.update { it.copy(isDownloading = false) }
-                    sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 다운로드를 실패했습니다."))
-                }
-                is DataResult.Success -> {
-                    _state.update {
-                        it.copy(photo = it.photo?.copy(localPath = result.data), isDownloading = false)
-                    }
-                    sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 다운로드가 완료되었습니다."))
-                }
-            }
-        }
-    }
-
 
     private fun sendSideEffect(effect: PhotoDetailSideEffect) {
         viewModelScope.launch {

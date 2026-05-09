@@ -4,6 +4,7 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
@@ -83,7 +84,11 @@ fun PhotoDetailScreen(
         contract = ActivityResultContracts.RequestPermission()
     ) { granted ->
         if (granted) {
-            viewModel.onIntent(PhotoDetailIntent.DownloadPhoto)
+            val photo = state.photo
+            if (photo != null) {
+                viewModel.onIntent(PhotoDetailIntent.ToggleFavorite(photo))
+            }
+
         } else {
             viewModel.onIntent(PhotoDetailIntent.PermissionDenied)
         }
@@ -105,7 +110,11 @@ fun PhotoDetailScreen(
                     if (photo != null) {
                         IconButton(
                             onClick = {
-                                viewModel.onIntent(PhotoDetailIntent.ToggleFavorite(photo))
+                                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                                    permissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                                } else {
+                                    viewModel.onIntent(PhotoDetailIntent.ToggleFavorite(photo))
+                                }
                             }
                         ) {
                             Icon(
@@ -125,15 +134,7 @@ fun PhotoDetailScreen(
     ) { padding ->
         PhotoDetailContent(
             modifier = Modifier.padding(padding),
-            state = state,
-            onDownloadClick = {
-                if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
-                    permissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                } else {
-                    viewModel.onIntent(PhotoDetailIntent.DownloadPhoto)
-
-                }
-            }
+            state = state
         )
 
     }
@@ -142,8 +143,7 @@ fun PhotoDetailScreen(
 @Composable
 fun PhotoDetailContent(
     modifier: Modifier,
-    state: PhotoDetailState,
-    onDownloadClick: () -> Unit
+    state: PhotoDetailState
 ) {
     when {
         state.isLoading -> {
@@ -197,18 +197,7 @@ fun PhotoDetailContent(
                         )
                         DetailStatChip(
                             value = "%,d".format(photo.downloads),
-                            icon = Icons.Default.Share
-                        )
-
-                        val downloadStatus = if (photo.localPath == null) stringResource(R.string.photo_download) else stringResource(R.string.photo_download_complete)
-
-                        DetailStatChip(
-                            value = downloadStatus,
-                            icon = ImageVector.vectorResource(id = R.drawable.ic_download),
-                            clickable = photo.localPath == null,
-                            onClick = {
-                                onDownloadClick()
-                            }
+                            icon = ImageVector.vectorResource(id = R.drawable.ic_download)
                         )
                     }
                 }
@@ -223,8 +212,19 @@ fun PhotoDetailContent(
                 UserInfoSection(photo = photo)
             }
 
-            if(state.isDownloading) {
-                Box(modifier = modifier.fillMaxSize(),
+            if (state.isDownloading) {
+                Box(modifier = Modifier
+                    .fillMaxSize()
+                    .background(
+                        Color.Black.copy(alpha = 0.2f)
+                    )
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) {
+                                awaitPointerEvent()
+                            }
+                        }
+                    },
                     contentAlignment = Alignment.Center) {
                     CircularProgressIndicator()
                 }

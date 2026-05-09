@@ -70,7 +70,7 @@ class PhotoFavoriteViewModel @Inject constructor(
                     )
                 }
                 if(favorites.isEmpty()) {
-                    sendSideEffect(PhotoFavoriteSideEffect.ShowSnackBar("관심 목록에 추가된 사진이 없습니다."))
+                    sendSideEffect(PhotoFavoriteSideEffect.ShowSnackBar("좋아요 목록에 추가된 사진이 없습니다."))
                 }
             }
         }
@@ -80,7 +80,10 @@ class PhotoFavoriteViewModel @Inject constructor(
     private fun toggleFavorite(photo: PhotoUiModel) {
         viewModelScope.launch(Dispatchers.IO) {
             when (val result = toggleFavoriteUseCase.execute(photo.toFavoritePhoto())) {
-                is DataResult.Success -> Unit
+                is DataResult.Success -> {
+                    val message = if(result.data) "좋아요!" else "좋아요 취소"
+                    sendSideEffect(PhotoFavoriteSideEffect.ShowSnackBar(message = message))
+                }
                 is DataResult.Failure -> {
                     sendSideEffect(PhotoFavoriteSideEffect.ShowSnackBar(result.error.toUiMessage()))
                 }

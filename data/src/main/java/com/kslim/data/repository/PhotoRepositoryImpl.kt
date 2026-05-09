@@ -61,24 +61,24 @@ class PhotoRepositoryImpl @Inject constructor(
         return photoLocalDataSource.observeFavoriteIds()
     }
 
-    override suspend fun toggleFavorite(photo: FavoritePhoto): DataResult<Unit> {
+    override suspend fun toggleFavorite(photo: FavoritePhoto): DataResult<Boolean> {
         return runCatching {
             val favoritePhoto = photoLocalDataSource.getFavoritePhoto(photo.id)
 
             if (favoritePhoto == null) {
-                photoLocalDataSource.insertFavorite(photo.toEntity())
+                return@runCatching downloadPhoto(photo)
             } else {
                 photoLocalDataSource.updateFavorite(photoId = photo.id, isFavorite = !favoritePhoto.isFavorite)
             }
 
-            DataResult.Success(Unit)
+            DataResult.Success(!favoritePhoto.isFavorite)
         }.getOrElse {
             DataResult.Failure(it.toDataError())
         }
     }
 
     // Photo Download
-    override suspend fun downloadPhoto(photo: FavoritePhoto): DataResult<String> {
+    private suspend fun downloadPhoto(photo: FavoritePhoto): DataResult<Boolean> {
         return when (val result = photoDataSource.getPhotoDownload(photoId = photo.id)) {
             is ApiResult.Failure -> DataResult.Failure(result.exception.toDataError())
             is ApiResult.Success -> {
@@ -94,18 +94,9 @@ class PhotoRepositoryImpl @Inject constructor(
                     val localPath = photoLocalDataSource.savePhoto(photoName, body.bytes())
                                     ?: return DataResult.Failure(DataError.Unknown("PhotoSave Failed"))
 
-                    val favoritePhoto = photoLocalDataSource.getFavoritePhoto(photo.id)
+                    photoLocalDataSource.insertFavorite(photo.toEntity().copy(localPath = localPath, isFavorite = true))
 
-                    if (favoritePhoto == null) {
-                        photoLocalDataSource.insertFavorite(photo.toEntity().copy(
-                            localPath = localPath,
-                            isFavorite = true
-                        ))
-                    } else {
-                        photoLocalDataSource.updateLocalPath(photoId = photo.id, path = localPath, isFavorite = true)
-                    }
-                    DataResult.Success(localPath)
-
+                    DataResult.Success(true)
                 }
             }
         }

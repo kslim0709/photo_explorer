@@ -45,6 +45,8 @@ fun PhotoFavoriteScreen(
         viewModel.sideEffect.collect { effect ->
             when (effect) {
                 is PhotoFavoriteSideEffect.ShowSnackBar -> {
+                    snackBarHostState.currentSnackbarData?.dismiss()
+
                     coroutineScope.launch {
                         snackBarHostState.showSnackbar(effect.message)
                     }

@@ -115,13 +115,22 @@ class PhotoListViewModel @Inject constructor(
         }
     }
 
-    // Photo 관심 토글
+    // 사진 다운로드 및 관심 등록, 해제
     private fun toggleFavorite(photo: PhotoListUiModel) {
+        _state.update { it.copy(isDownloading = true) }
+
         viewModelScope.launch(Dispatchers.IO) {
             when (val result = toggleFavoriteUseCase.execute(photo.toFavoritePhoto())) {
-                is DataResult.Success -> Unit
+                is DataResult.Success -> {
+                    _state.update {
+                        it.copy(isDownloading = false)
+                    }
+                    val message = if(result.data) "좋아요!" else "좋아요 취소"
+                    sendSideEffect(PhotoListSideEffect.ShowSnackBar(message = message))
+                }
                 is DataResult.Failure -> {
-                    sendSideEffect(PhotoListSideEffect.ShowSnackBar(result.error.toUiMessage()))
+                    _state.update { it.copy(isDownloading = false) }
+                    sendSideEffect(PhotoListSideEffect.ShowSnackBar(message = result.error.toUiMessage()))
                 }
             }
         }
