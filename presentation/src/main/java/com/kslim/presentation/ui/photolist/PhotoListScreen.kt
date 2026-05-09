@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kslim.presentation.R
+import com.kslim.presentation.common.LocalNetworkStatus
 import com.kslim.presentation.theme.PhotoExplorerTheme
 import com.kslim.presentation.ui.component.PhotoErrorContent
 import com.kslim.presentation.ui.component.PhotoExplorerTopBar
@@ -56,6 +57,7 @@ fun PhotoListScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
+    val isConnected = LocalNetworkStatus.current
 
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { effect ->
@@ -101,10 +103,12 @@ fun PhotoListScreen(
                 viewModel.onIntent(PhotoListIntent.ToggleFavorite(photo))
             },
             onRetryClick = {
-                viewModel.onIntent(PhotoListIntent.LoadPhotos)
+                if(isConnected)
+                    viewModel.onIntent(PhotoListIntent.LoadPhotos)
             },
             onLoadMore = {
-                viewModel.onIntent(PhotoListIntent.LoadMore)
+                if(isConnected)
+                    viewModel.onIntent(PhotoListIntent.LoadMore)
             }
         )
     }

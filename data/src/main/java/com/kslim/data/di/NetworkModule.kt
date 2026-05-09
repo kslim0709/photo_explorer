@@ -1,15 +1,19 @@
 package com.kslim.data.di
 
+import android.content.Context
+import android.net.ConnectivityManager
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import com.kslim.data.network.Network
 import com.kslim.data.network.NetworkConstants
 import com.kslim.data.network.NetworkImpl
+import com.kslim.data.network.NetworkManager
 import com.kslim.data.network.create
 import com.kslim.data.network.interceptor.AuthInterceptor
 import com.kslim.data.remote.api.UnsplashApi
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.serialization.json.Json
 import okhttp3.MediaType.Companion.toMediaType
@@ -53,4 +57,12 @@ internal object NetworkModule {
     @Provides
     fun provideUnsplashApi(network: Network): UnsplashApi =
         network.create<UnsplashApi>(baseUrl = NetworkConstants.BASE_URL)
+
+
+    // 네트워크 매니저
+    @Provides
+    @Singleton
+    fun providesNetworkManager(@ApplicationContext context: Context): NetworkManager {
+        return NetworkManager(connectivityManager = context.getSystemService(ConnectivityManager::class.java))
+    }
 }

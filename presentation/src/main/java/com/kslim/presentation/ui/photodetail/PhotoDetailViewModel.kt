@@ -39,14 +39,20 @@ class PhotoDetailViewModel @Inject constructor(
     private val _sideEffect = Channel<PhotoDetailSideEffect>(Channel.BUFFERED)
     val sideEffect: Flow<PhotoDetailSideEffect> = _sideEffect.receiveAsFlow()
 
+    private val argsPhotoId = MutableStateFlow("")
+
     init {
         runCatching {
             savedStateHandle.toRoute<PhotoScreenRoute.PhotoDetail>()
         }.onFailure {
             _state.update { it.copy(errorMessage = it.errorMessage) }
-        }.onSuccess {
+        }.onSuccess { result ->
             observeFavoriteIds()
-            loadDetail(it.photoId)
+
+            result.photoId.let {
+                argsPhotoId.update { result.photoId }
+                loadDetail(result.photoId)
+            }
         }
     }
 
@@ -58,13 +64,24 @@ class PhotoDetailViewModel @Inject constructor(
             PhotoDetailIntent.PermissionDenied -> {
                 sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("사진 저장 권한이 필요합니다."))
             }
+            PhotoDetailIntent.LoadPhotoDetail -> {
+                if(state.value.errorMessage != null && state.value.photo == null) {
+                    loadDetail(argsPhotoId.value)
+                }
+            }
             is PhotoDetailIntent.ToggleFavorite -> {
                 toggleFavorite(intent.photo)
             }
+
         }
     }
 
     private fun loadDetail(photoId: String) {
+        if (photoId.isEmpty()) {
+            sendSideEffect(PhotoDetailSideEffect.ShowSnackBar("상세 사진 정보를 불러올 수 없습니다."))
+            return
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             _state.update { it.copy(isLoading = true, errorMessage = null) }
 
@@ -104,7 +121,7 @@ class PhotoDetailViewModel @Inject constructor(
                     _state.update {
                         it.copy(isDownloading = false)
                     }
-                    val message = if(result.data) "좋아요!" else "좋아요 취소"
+                    val message = if (result.data) "좋아요!" else "좋아요 취소"
                     sendSideEffect(PhotoDetailSideEffect.ShowSnackBar(message = message))
                 }
                 is DataResult.Failure -> {

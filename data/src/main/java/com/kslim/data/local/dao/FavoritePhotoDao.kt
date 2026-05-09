@@ -12,7 +12,7 @@ interface FavoritePhotoDao {
     @Query("SELECT id FROM favorite_photos WHERE isFavorite = 1")
     fun observeFavoriteIds(): Flow<List<String>>
 
-    @Query("SELECT * FROM favorite_photos WHERE isFavorite = 1")
+    @Query("SELECT * FROM favorite_photos")
     fun observeFavoritePhotos(): Flow<List<FavoritePhotoEntity>>
 
     @Query("SELECT id FROM favorite_photos WHERE isFavorite = 1")

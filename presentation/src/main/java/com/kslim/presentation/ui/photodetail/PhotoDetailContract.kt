@@ -16,6 +16,8 @@ sealed interface PhotoDetailIntent {
     data object ClickBack : PhotoDetailIntent
     data object PermissionDenied : PhotoDetailIntent
 
+    data object LoadPhotoDetail: PhotoDetailIntent
+
     data class ToggleFavorite(val photo: PhotoDetailUiModel) : PhotoDetailIntent
 }
 

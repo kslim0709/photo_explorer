@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
+import com.kslim.presentation.ui.component.NetworkStatusBanner
 import com.kslim.presentation.navigation.PhotoDoubleBackToExit
 import com.kslim.presentation.navigation.PhotoNavHost
 
@@ -19,6 +20,7 @@ fun PhotoExplorerApp() {
             navController = navController
         )
 
+        NetworkStatusBanner()
         PhotoDoubleBackToExit(navController)
     }
 }

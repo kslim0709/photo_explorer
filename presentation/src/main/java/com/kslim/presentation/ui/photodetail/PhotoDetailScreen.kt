@@ -43,6 +43,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.kslim.presentation.R
+import com.kslim.presentation.common.LocalNetworkStatus
 import com.kslim.presentation.ui.component.PhotoAsyncImage
 import com.kslim.presentation.ui.component.PhotoErrorContent
 import com.kslim.presentation.ui.component.PhotoExplorerTopBar
@@ -61,6 +62,8 @@ fun PhotoDetailScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
+    val isConnected = LocalNetworkStatus.current
+
     LaunchedEffect(Unit) {
         viewModel.sideEffect.collect { effect ->
             when (effect) {
@@ -78,6 +81,10 @@ fun PhotoDetailScreen(
                 }
             }
         }
+    }
+
+    LaunchedEffect(isConnected) {
+        if(isConnected) viewModel.onIntent(PhotoDetailIntent.LoadPhotoDetail)
     }
 
     val permissionLauncher = rememberLauncherForActivityResult(
