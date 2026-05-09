@@ -7,11 +7,13 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import androidx.annotation.RequiresApi
+import androidx.core.net.toUri
 import com.kslim.data.local.dao.FavoritePhotoDao
 import com.kslim.data.local.datasource.PhotoLocalDataSource
 import com.kslim.data.local.entity.FavoritePhotoEntity
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import java.io.File
 import javax.inject.Inject
 
@@ -23,8 +25,19 @@ class PhotoLocalDataSourceImpl @Inject constructor(
         return favoritePhotoDao.observeFavoriteIds()
     }
 
+    // 관심 (좋아요) 화면 내 리스트 구성할 때, 저장된 사진만 보여줌 ( 존재 하지 않으면 미노출 )
     override fun observeFavoritePhotos(): Flow<List<FavoritePhotoEntity>> {
-        return favoritePhotoDao.observeFavoritePhotos()
+        return favoritePhotoDao.observeFavoritePhotos().map { photos ->
+            val invalidPhotos = photos
+                .filter { photo ->
+                    photo.localPath.isNullOrEmpty() || !isLocalImageExists(photo.localPath)
+                }.map { it.id }
+                .toSet()
+
+            photos.filterNot { photo ->
+                photo.id in invalidPhotos
+            }
+        }
     }
 
     override suspend fun getFavoriteIds(): List<String> {
@@ -124,5 +137,19 @@ class PhotoLocalDataSourceImpl @Inject constructor(
             )
             uri?.toString() ?: file.absolutePath
         }.getOrNull()
+    }
+
+    private fun isLocalImageExists(localPath: String): Boolean {
+        return runCatching {
+            if (localPath.startsWith("content://")) {
+                context.contentResolver.openInputStream(localPath.toUri())
+                    ?.use {
+                        true
+                    }
+                ?: false
+            } else {
+                File(localPath).exists()
+            }
+        }.getOrDefault(false)
     }
 }

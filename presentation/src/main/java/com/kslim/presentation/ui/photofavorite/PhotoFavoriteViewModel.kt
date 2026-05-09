@@ -70,7 +70,7 @@ class PhotoFavoriteViewModel @Inject constructor(
                     )
                 }
                 if(favorites.isEmpty()) {
-                    sendSideEffect(PhotoFavoriteSideEffect.ShowSnackBar("좋아요 목록에 추가된 사진이 없습니다."))
+                    sendSideEffect(PhotoFavoriteSideEffect.ShowSnackBar("좋아요 목록에 저장된 사진이 없습니다."))
                 }
             }
         }
